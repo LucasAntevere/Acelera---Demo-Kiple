@@ -31,7 +31,12 @@ const bottomItems = [
 export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
-  const location = useLocation();
+  const { connectionStatus } = useKipleData();
+
+  const dbStatusColor =
+    connectionStatus === "connected" ? "bg-success" :
+    connectionStatus === "checking"  ? "bg-warning animate-pulse" :
+    "bg-danger";
 
   return (
     <Sidebar collapsible="icon" className="border-sidebar-border">
@@ -87,6 +92,9 @@ export function AppSidebar() {
                 >
                   <item.icon className="h-4 w-4 flex-shrink-0" />
                   {!collapsed && <span className="text-sm">{item.title}</span>}
+                  {!collapsed && item.url === "/setup-banco" && (
+                    <span className={`ml-auto h-1.5 w-1.5 rounded-full ${dbStatusColor}`} />
+                  )}
                 </NavLink>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -99,10 +107,11 @@ export function AppSidebar() {
               <div className="h-7 w-7 rounded-full bg-sidebar-primary flex items-center justify-center flex-shrink-0">
                 <span className="text-xs font-bold text-sidebar-primary-foreground">HR</span>
               </div>
-              <div className="min-w-0">
+              <div className="min-w-0 flex-1">
                 <p className="text-xs font-medium text-sidebar-accent-foreground truncate">Maria Santos</p>
                 <p className="text-[10px] text-sidebar-foreground truncate">HR Manager</p>
               </div>
+              <div className={`h-2 w-2 rounded-full flex-shrink-0 ${dbStatusColor}`} title={`Banco: ${connectionStatus}`} />
             </div>
           </div>
         )}
