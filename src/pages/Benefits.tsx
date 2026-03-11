@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+﻿import { useMemo, useState } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -66,31 +66,41 @@ export default function BenefitsPage() {
   };
 
   return (
-    <DashboardLayout title="Beneficios" subtitle="Cadastro e manutencao de beneficios">
+    <DashboardLayout title="Benefícios" subtitle="Cadastro e manutenção de benefícios">
       <div className="flex items-center justify-between mb-4">
         <div>
           <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
-            Beneficios
-            {loading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
+            Benefícios
+            {loading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" aria-label="Carregando benefícios" />}
           </h2>
-          <p className="text-sm text-muted-foreground mt-0.5">{beneficios.length} beneficios cadastrados</p>
+          <p className="text-sm text-muted-foreground mt-0.5">{beneficios.length} benefícios cadastrados</p>
         </div>
-        <Button size="sm" className="h-8 text-xs gap-1.5" onClick={openCreate}><Plus className="h-3.5 w-3.5" /> Novo Beneficio</Button>
+        <Button size="sm" className="h-8 text-xs gap-1.5" onClick={openCreate} title="Cadastrar novo benefício" aria-label="Cadastrar novo benefício">
+          <Plus className="h-3.5 w-3.5" aria-hidden="true" /> Novo Benefício
+        </Button>
       </div>
 
       <div className="bg-card border border-border rounded-xl p-4 card-shadow mb-4 space-y-3">
         <div>
-          <Label htmlFor="beneficio-search" className="text-xs text-muted-foreground">Buscar beneficio</Label>
+          <Label htmlFor="beneficio-search" className="text-xs text-muted-foreground">Buscar benefício</Label>
           <div className="relative mt-1.5">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input id="beneficio-search" placeholder="Digite o nome" className="pl-9 h-9 text-sm" value={search} onChange={(e) => setSearch(e.target.value)} />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden="true" />
+            <Input
+              id="beneficio-search"
+              placeholder="Digite o nome"
+              title="Busca por nome do benefício"
+              aria-label="Busca por nome do benefício"
+              className="pl-9 h-9 text-sm"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
             <Label className="text-xs text-muted-foreground">Filtrar por tipo</Label>
             <Select value={tipoFilter} onValueChange={(v: any) => setTipoFilter(v)}>
-              <SelectTrigger className="h-9 text-sm mt-1.5"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="h-9 text-sm mt-1.5" aria-label="Filtro por tipo de benefício"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todos os tipos</SelectItem>
                 {BENEFICIO_TIPO_OPTIONS.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
@@ -100,7 +110,7 @@ export default function BenefitsPage() {
           <div>
             <Label className="text-xs text-muted-foreground">Filtrar por status</Label>
             <Select value={statusFilter} onValueChange={(v: any) => setStatusFilter(v)}>
-              <SelectTrigger className="h-9 text-sm mt-1.5"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="h-9 text-sm mt-1.5" aria-label="Filtro por status"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todos os status</SelectItem>
                 {STATUS_OPTIONS.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
@@ -112,40 +122,43 @@ export default function BenefitsPage() {
 
       {formOpen && (
         <div className="bg-card border border-border rounded-xl p-4 card-shadow mb-4 space-y-3">
-          <h3 className="text-sm font-semibold text-foreground">{editing ? "Editar Beneficio" : "Novo Beneficio"}</h3>
+          <h3 className="text-sm font-semibold text-foreground">{editing ? "Editar Benefício" : "Novo Benefício"}</h3>
 
           <div>
-            <Label className="text-xs text-muted-foreground">Nome</Label>
-            <Input className="mt-1.5" placeholder="Ex.: Plano de Saude" value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} />
+            <Label htmlFor="beneficio-nome" className="text-xs text-muted-foreground">Nome</Label>
+            <Input id="beneficio-nome" className="mt-1.5" placeholder="Ex.: Plano de Saúde" title="Nome do benefício" value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} />
           </div>
 
           <div>
-            <Label className="text-xs text-muted-foreground">Descricao</Label>
-            <Input className="mt-1.5" placeholder="Descreva o beneficio" value={form.descricao} onChange={(e) => setForm({ ...form, descricao: e.target.value })} />
+            <Label htmlFor="beneficio-descricao" className="text-xs text-muted-foreground">Descrição</Label>
+            <Input id="beneficio-descricao" className="mt-1.5" placeholder="Descreva o benefício" title="Descrição do benefício" value={form.descricao} onChange={(e) => setForm({ ...form, descricao: e.target.value })} />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <Label className="text-xs text-muted-foreground">Tipo</Label>
               <Select value={form.tipo} onValueChange={(v: any) => setForm({ ...form, tipo: v })}>
-                <SelectTrigger className="mt-1.5"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="mt-1.5" aria-label="Tipo do benefício"><SelectValue /></SelectTrigger>
                 <SelectContent>{BENEFICIO_TIPO_OPTIONS.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
               </Select>
             </div>
             <div>
               <Label className="text-xs text-muted-foreground">Status</Label>
               <Select value={form.status} onValueChange={(v: any) => setForm({ ...form, status: v })}>
-                <SelectTrigger className="mt-1.5"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="mt-1.5" aria-label="Status do benefício"><SelectValue /></SelectTrigger>
                 <SelectContent>{STATUS_OPTIONS.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
               </Select>
             </div>
           </div>
 
           <div>
-            <Label className="text-xs text-muted-foreground">Valor</Label>
+            <Label htmlFor="beneficio-valor" className="text-xs text-muted-foreground">Valor</Label>
             <Input
+              id="beneficio-valor"
               className="mt-1.5"
               inputMode="numeric"
+              title="Valor do benefício em reais"
+              aria-label="Valor do benefício em reais"
               value={valorInput}
               onChange={(e) => {
                 const masked = formatCurrencyInput(e.target.value);
@@ -157,15 +170,15 @@ export default function BenefitsPage() {
 
           {errorMsg && <p className="text-xs text-danger">{errorMsg}</p>}
           <div className="flex gap-2 pt-1">
-            <Button size="sm" className="h-8 text-xs" onClick={() => void save()}>Salvar</Button>
-            <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => setFormOpen(false)}>Cancelar</Button>
+            <Button size="sm" className="h-8 text-xs" onClick={() => void save()} title="Salvar benefício">Salvar</Button>
+            <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => setFormOpen(false)} title="Cancelar edição">Cancelar</Button>
           </div>
         </div>
       )}
 
       <div className="bg-card border border-border rounded-xl card-shadow overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-xs">
+          <table className="w-full text-xs" aria-label="Tabela de benefícios">
             <thead>
               <tr className="border-b border-border bg-muted/30">
                 <th className="text-left px-4 py-3 text-muted-foreground font-medium">Nome</th>
@@ -189,17 +202,18 @@ export default function BenefitsPage() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex gap-2 justify-end">
-                      <Button size="sm" variant="outline" className="h-7 text-[11px]" onClick={() => openEdit(b)}>Editar</Button>
+                      <Button size="sm" variant="outline" className="h-7 text-[11px]" onClick={() => openEdit(b)} title={`Editar benefício ${b.nome}`}>Editar</Button>
                       <Button
                         size="sm"
                         variant="outline"
                         className="h-7 text-[11px]"
+                        title={`Excluir benefício ${b.nome}`}
                         onClick={async () => {
                           const result = await removerBeneficio(b.id);
                           if (!result.ok) setErrorMsg(result.message ?? "Erro ao excluir");
                         }}
                       >
-                        <Trash2 className="h-3 w-3 mr-1" /> Excluir
+                        <Trash2 className="h-3 w-3 mr-1" aria-hidden="true" /> Excluir
                       </Button>
                     </div>
                   </td>

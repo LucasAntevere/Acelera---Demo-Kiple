@@ -135,13 +135,13 @@ export default function EmployeesPage() {
 
     if (!payload.data_nascimento) {
       setSaving(false);
-      setErrorMsg("Data de nascimento e obrigatoria.");
+      setErrorMsg("Data de nascimento é obrigatória.");
       return;
     }
 
     if (!payload.cargo) {
       setSaving(false);
-      setErrorMsg("Cargo e obrigatorio.");
+      setErrorMsg("Cargo é obrigatório.");
       return;
     }
 
@@ -149,7 +149,7 @@ export default function EmployeesPage() {
     setSaving(false);
 
     if (!result.ok) {
-      setErrorMsg(result.message ?? "Erro ao salvar funcionario");
+      setErrorMsg(result.message ?? "Erro ao salvar funcionário");
       return;
     }
 
@@ -172,31 +172,31 @@ export default function EmployeesPage() {
       setVinculos(await listarVinculosFuncionario(selected.id));
       setNovoVinculo({ beneficio_id: 0, data_inicio: new Date().toISOString().slice(0, 10) });
     } else {
-      setErrorMsg(result.message ?? "Erro ao vincular beneficio");
+      setErrorMsg(result.message ?? "Erro ao vincular benefício");
     }
   };
 
   return (
-    <DashboardLayout title="Funcionarios" subtitle="Cadastro e acompanhamento operacional">
+    <DashboardLayout title="Funcionários" subtitle="Cadastro e acompanhamento operacional">
       <div className="flex items-center justify-between mb-4">
         <div>
           <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
-            Funcionarios
-            {loading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
+            Funcionários
+            {loading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" aria-label="Carregando funcionários" />}
           </h2>
           <p className="text-sm text-muted-foreground mt-0.5">{funcionarios.length} registros</p>
         </div>
-        <Button size="sm" className="h-8 text-xs gap-1.5" onClick={openCreate}>
-          <Plus className="h-3.5 w-3.5" /> Novo Funcionario
+        <Button size="sm" className="h-8 text-xs gap-1.5" onClick={openCreate} title="Cadastrar novo funcionário" aria-label="Cadastrar novo funcionário">
+          <Plus className="h-3.5 w-3.5" aria-hidden="true" /> Novo Funcionário
         </Button>
       </div>
 
       <div className="bg-card border border-border rounded-xl p-4 card-shadow mb-4 space-y-3">
         <div>
-          <Label htmlFor="func-search" className="text-xs text-muted-foreground">Buscar funcionario</Label>
+          <Label htmlFor="func-search" className="text-xs text-muted-foreground">Buscar funcionário</Label>
           <div className="relative mt-1.5">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input id="func-search" placeholder="Digite nome, cargo ou departamento" className="pl-9 h-9 text-sm" value={search} onChange={(e) => setSearch(e.target.value)} />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden="true" />
+            <Input id="func-search" placeholder="Digite nome, cargo ou departamento" className="pl-9 h-9 text-sm" value={search} onChange={(e) => setSearch(e.target.value)} title="Busca por nome, cargo ou departamento" aria-label="Busca por nome, cargo ou departamento" />
           </div>
         </div>
 
@@ -204,21 +204,21 @@ export default function EmployeesPage() {
           <div>
             <Label className="text-xs text-muted-foreground">Filtrar por status</Label>
             <Select value={statusFilter} onValueChange={(v: any) => setStatusFilter(v)}>
-              <SelectTrigger className="h-9 text-sm mt-1.5"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="h-9 text-sm mt-1.5" aria-label="Filtro por status"><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todos status</SelectItem>
+                <SelectItem value="all">Todos os status</SelectItem>
                 <SelectItem value="ativo">Ativo</SelectItem>
                 <SelectItem value="inativo">Inativo</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div>
-            <Label className="text-xs text-muted-foreground">Ordenacao</Label>
+            <Label className="text-xs text-muted-foreground">Ordenação</Label>
             <Select value={sortBy} onValueChange={(v: any) => setSortBy(v)}>
-              <SelectTrigger className="h-9 text-sm mt-1.5"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="h-9 text-sm mt-1.5" aria-label="Ordenação da listagem"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="nome">Ordenar por nome</SelectItem>
-                <SelectItem value="data_contratacao">Ordenar por contratacao</SelectItem>
+                <SelectItem value="data_contratacao">Ordenar por contratação</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -227,16 +227,16 @@ export default function EmployeesPage() {
 
       {formOpen && (
         <div className="bg-card border border-border rounded-xl p-4 card-shadow mb-4 space-y-3">
-          <h3 className="text-sm font-semibold text-foreground">{editing ? "Editar Funcionario" : "Novo Funcionario"}</h3>
+          <h3 className="text-sm font-semibold text-foreground">{editing ? "Editar Funcionário" : "Novo Funcionário"}</h3>
 
           <div>
-            <Label className="text-xs text-muted-foreground">Nome</Label>
-            <Input className="mt-1.5" placeholder="Nome completo" value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} />
+            <Label htmlFor="func-nome" className="text-xs text-muted-foreground">Nome</Label>
+            <Input id="func-nome" className="mt-1.5" placeholder="Nome completo" value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} title="Nome completo do funcionário" />
           </div>
 
           <div>
-            <Label className="text-xs text-muted-foreground">Cargo</Label>
-            <Input className="mt-1.5" placeholder="Ex.: Analista de RH" value={form.cargo} onChange={(e) => setForm({ ...form, cargo: e.target.value })} />
+            <Label htmlFor="func-cargo" className="text-xs text-muted-foreground">Cargo</Label>
+            <Input id="func-cargo" className="mt-1.5" placeholder="Ex.: Analista de RH" value={form.cargo} onChange={(e) => setForm({ ...form, cargo: e.target.value })} title="Cargo atual do funcionário" />
           </div>
 
           <div>
@@ -245,7 +245,7 @@ export default function EmployeesPage() {
               value={form.departamento_id !== null ? String(form.departamento_id) : "none"}
               onValueChange={(v) => setForm({ ...form, departamento_id: v === "none" ? null : Number(v) })}
             >
-              <SelectTrigger className="mt-1.5"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="mt-1.5" aria-label="Selecionar departamento"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="none">Sem departamento</SelectItem>
                 {departamentos.map((d) => (
@@ -256,19 +256,19 @@ export default function EmployeesPage() {
           </div>
 
           <div>
-            <Label className="text-xs text-muted-foreground">Endereco</Label>
-            <Input className="mt-1.5" placeholder="Cidade, estado e complemento" value={form.endereco} onChange={(e) => setForm({ ...form, endereco: e.target.value })} />
+            <Label htmlFor="func-endereco" className="text-xs text-muted-foreground">Endereço</Label>
+            <Input id="func-endereco" className="mt-1.5" placeholder="Cidade, estado e complemento" value={form.endereco} onChange={(e) => setForm({ ...form, endereco: e.target.value })} title="Endereço do funcionário" />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <Label className="text-xs text-muted-foreground">Data de nascimento</Label>
-              <Input className="mt-1.5" type="date" value={form.data_nascimento ?? ""} onChange={(e) => setForm({ ...form, data_nascimento: e.target.value })} />
+              <Label htmlFor="func-nascimento" className="text-xs text-muted-foreground">Data de nascimento</Label>
+              <Input id="func-nascimento" className="mt-1.5" type="date" value={form.data_nascimento ?? ""} onChange={(e) => setForm({ ...form, data_nascimento: e.target.value })} title="Data de nascimento do funcionário" />
             </div>
             <div>
               <Label className="text-xs text-muted-foreground">Sexo</Label>
               <Select value={form.sexo} onValueChange={(v: any) => setForm({ ...form, sexo: v })}>
-                <SelectTrigger className="mt-1.5"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="mt-1.5" aria-label="Sexo"><SelectValue /></SelectTrigger>
                 <SelectContent>{SEXO_OPTIONS.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
               </Select>
             </div>
@@ -276,11 +276,14 @@ export default function EmployeesPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <Label className="text-xs text-muted-foreground">Salario</Label>
+              <Label htmlFor="func-salario" className="text-xs text-muted-foreground">Salário</Label>
               <Input
+                id="func-salario"
                 className="mt-1.5"
                 inputMode="numeric"
                 value={salarioInput}
+                title="Salário em reais"
+                aria-label="Salário em reais"
                 onChange={(e) => {
                   const masked = formatCurrencyInput(e.target.value);
                   setSalarioInput(masked);
@@ -291,30 +294,30 @@ export default function EmployeesPage() {
             <div>
               <Label className="text-xs text-muted-foreground">Status</Label>
               <Select value={form.status} onValueChange={(v: any) => setForm({ ...form, status: v })}>
-                <SelectTrigger className="mt-1.5"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="mt-1.5" aria-label="Status do funcionário"><SelectValue /></SelectTrigger>
                 <SelectContent>{STATUS_OPTIONS.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
               </Select>
             </div>
           </div>
 
           <div>
-            <Label className="text-xs text-muted-foreground">Data de contratacao</Label>
-            <Input className="mt-1.5" type="date" value={form.data_contratacao} onChange={(e) => setForm({ ...form, data_contratacao: e.target.value })} />
+            <Label htmlFor="func-contratacao" className="text-xs text-muted-foreground">Data de contratação</Label>
+            <Input id="func-contratacao" className="mt-1.5" type="date" value={form.data_contratacao} onChange={(e) => setForm({ ...form, data_contratacao: e.target.value })} title="Data de admissão do funcionário" />
           </div>
 
           {errorMsg && <p className="text-xs text-danger">{errorMsg}</p>}
           <div className="flex gap-2 pt-1">
-            <Button size="sm" className="h-8 text-xs" onClick={saveFuncionario} disabled={saving}>
+            <Button size="sm" className="h-8 text-xs" onClick={saveFuncionario} disabled={saving} title="Salvar funcionário">
               {saving ? "Salvando..." : "Salvar"}
             </Button>
-            <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => setFormOpen(false)}>Cancelar</Button>
+            <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => setFormOpen(false)} title="Cancelar edição">Cancelar</Button>
           </div>
         </div>
       )}
 
       <div className="bg-card border border-border rounded-xl card-shadow overflow-hidden mb-4">
         <div className="overflow-x-auto">
-          <table className="w-full text-xs">
+          <table className="w-full text-xs" aria-label="Tabela de funcionários">
             <thead>
               <tr className="border-b border-border bg-muted/30">
                 <th className="text-left px-4 py-3 text-muted-foreground font-medium">Nome</th>
@@ -323,8 +326,8 @@ export default function EmployeesPage() {
                 <th className="text-left px-4 py-3 text-muted-foreground font-medium">Nascimento</th>
                 <th className="text-left px-4 py-3 text-muted-foreground font-medium">Idade</th>
                 <th className="text-left px-4 py-3 text-muted-foreground font-medium">Sexo</th>
-                <th className="text-left px-4 py-3 text-muted-foreground font-medium">Salario</th>
-                <th className="text-left px-4 py-3 text-muted-foreground font-medium">Contratacao</th>
+                <th className="text-left px-4 py-3 text-muted-foreground font-medium">Salário</th>
+                <th className="text-left px-4 py-3 text-muted-foreground font-medium">Contratação</th>
                 <th className="text-left px-4 py-3 text-muted-foreground font-medium">Status</th>
                 <th className="px-4 py-3" />
               </tr>
@@ -343,6 +346,8 @@ export default function EmployeesPage() {
                   <td className="px-4 py-3">
                     <button
                       onClick={() => void atualizarStatus(f.id, f.status === "ativo" ? "inativo" : "ativo")}
+                      title={`Alterar status de ${f.nome}`}
+                      aria-label={`Alterar status de ${f.nome}`}
                       className={`text-[11px] px-2 py-0.5 rounded ${f.status === "ativo" ? "bg-success/10 text-success" : "bg-warning/10 text-warning"}`}
                     >
                       {f.status}
@@ -350,9 +355,9 @@ export default function EmployeesPage() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex gap-2 justify-end">
-                      <Button size="sm" variant="outline" className="h-7 text-[11px]" onClick={() => setSelected(f)}>Detalhes</Button>
-                      <Button size="sm" variant="outline" className="h-7 text-[11px]" onClick={() => openEdit(f)}>
-                        <PencilLine className="h-3 w-3 mr-1" /> Editar
+                      <Button size="sm" variant="outline" className="h-7 text-[11px]" onClick={() => setSelected(f)} title={`Ver detalhes de ${f.nome}`}>Detalhes</Button>
+                      <Button size="sm" variant="outline" className="h-7 text-[11px]" onClick={() => openEdit(f)} title={`Editar ${f.nome}`}>
+                        <PencilLine className="h-3 w-3 mr-1" aria-hidden="true" /> Editar
                       </Button>
                     </div>
                   </td>
@@ -366,8 +371,8 @@ export default function EmployeesPage() {
       {selected && (
         <div className="bg-card border border-border rounded-xl p-4 card-shadow">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-foreground">Detalhe de {selected.nome}</h3>
-            <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => setSelected(null)}>Fechar</Button>
+            <h3 className="text-sm font-semibold text-foreground">Detalhes de {selected.nome}</h3>
+            <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => setSelected(null)} title="Fechar painel de detalhes">Fechar</Button>
           </div>
 
           <div className="mb-3 text-xs text-muted-foreground">
@@ -378,39 +383,40 @@ export default function EmployeesPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div className="border border-border rounded-lg p-3">
-              <h4 className="text-xs font-semibold text-foreground mb-3">Beneficios vinculados</h4>
+              <h4 className="text-xs font-semibold text-foreground mb-3">Benefícios vinculados</h4>
               <div className="space-y-2 mb-3">
                 <div>
-                  <Label className="text-xs text-muted-foreground">Beneficio</Label>
+                  <Label className="text-xs text-muted-foreground">Benefício</Label>
                   <Select value={String(novoVinculo.beneficio_id || "0")} onValueChange={(v) => setNovoVinculo((prev) => ({ ...prev, beneficio_id: Number(v) }))}>
-                    <SelectTrigger className="h-8 text-xs mt-1.5"><SelectValue placeholder="Selecione um beneficio" /></SelectTrigger>
+                    <SelectTrigger className="h-8 text-xs mt-1.5" aria-label="Selecionar benefício para vínculo"><SelectValue placeholder="Selecione um benefício" /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="0">Selecione um beneficio</SelectItem>
+                      <SelectItem value="0">Selecione um benefício</SelectItem>
                       {beneficios.filter((b) => b.status === "ativo").map((b) => <SelectItem key={b.id} value={String(b.id)}>{b.nome}</SelectItem>)}
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-2 items-end">
                   <div>
-                    <Label className="text-xs text-muted-foreground">Data de inicio</Label>
-                    <Input type="date" className="h-8 text-xs mt-1.5" value={novoVinculo.data_inicio} onChange={(e) => setNovoVinculo((prev) => ({ ...prev, data_inicio: e.target.value }))} />
+                    <Label htmlFor="vinculo-data-inicio" className="text-xs text-muted-foreground">Data de início</Label>
+                    <Input id="vinculo-data-inicio" type="date" className="h-8 text-xs mt-1.5" value={novoVinculo.data_inicio} onChange={(e) => setNovoVinculo((prev) => ({ ...prev, data_inicio: e.target.value }))} title="Data inicial do vínculo do benefício" />
                   </div>
-                  <Button size="sm" className="h-8 text-xs" onClick={() => void vincularBeneficio()}>Vincular</Button>
+                  <Button size="sm" className="h-8 text-xs" onClick={() => void vincularBeneficio()} title="Vincular benefício ao funcionário">Vincular</Button>
                 </div>
               </div>
               <div className="space-y-2">
-                {vinculos.length === 0 && <p className="text-xs text-muted-foreground">Sem beneficios vinculados.</p>}
+                {vinculos.length === 0 && <p className="text-xs text-muted-foreground">Sem benefícios vinculados.</p>}
                 {vinculos.map((v) => (
                   <div key={v.id} className="flex items-center justify-between text-xs border border-border rounded px-2 py-1.5">
                     <div>
-                      <p className="font-medium text-foreground">{v.beneficio?.nome ?? `Beneficio #${v.beneficio_id}`}</p>
-                      <p className="text-muted-foreground">Inicio: {dt(v.data_inicio)} • Fim: {dt(v.data_fim)}</p>
+                      <p className="font-medium text-foreground">{v.beneficio?.nome ?? `Benefício #${v.beneficio_id}`}</p>
+                      <p className="text-muted-foreground">Início: {dt(v.data_inicio)} • Fim: {dt(v.data_fim)}</p>
                     </div>
                     {!v.data_fim && (
                       <Button
                         size="sm"
                         variant="outline"
                         className="h-7 text-[11px]"
+                        title="Encerrar vínculo do benefício"
                         onClick={async () => {
                           const today = new Date().toISOString().slice(0, 10);
                           const result = await encerrarVinculo(v.id, today);
@@ -426,9 +432,9 @@ export default function EmployeesPage() {
             </div>
 
             <div className="border border-border rounded-lg p-3">
-              <h4 className="text-xs font-semibold text-foreground mb-2">Historico de desligamentos</h4>
+              <h4 className="text-xs font-semibold text-foreground mb-2">Histórico de desligamentos</h4>
               <div className="space-y-2">
-                {desligamentos.length === 0 && <p className="text-xs text-muted-foreground">Nenhum desligamento para este funcionario.</p>}
+                {desligamentos.length === 0 && <p className="text-xs text-muted-foreground">Nenhum desligamento para este funcionário.</p>}
                 {desligamentos.map((d) => (
                   <div key={d.id} className="text-xs border border-border rounded px-2 py-1.5">
                     <p className="font-medium text-foreground">{d.motivo_nome ?? `Motivo #${d.motivo_desligamento_id}`}</p>

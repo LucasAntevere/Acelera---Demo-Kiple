@@ -57,7 +57,7 @@ export function useDepartamentos() {
     if (countError) return { ok: false, message: countError.message };
 
     if ((count ?? 0) > 0) {
-      return { ok: false, message: "Departamento vinculado a funcionarios. Realoque antes de excluir." };
+      return { ok: false, message: "Departamento vinculado a funcionários. Realoque antes de excluir." };
     }
 
     const { error: dbError } = await kipledDb.from("departamentos" as any).delete().eq("id", id);
@@ -77,3 +77,4 @@ export function useDepartamentos() {
     removerDepartamento,
   };
 }
+

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { kipledDb } from "@/integrations/supabase/kiple-client";
 import type { Beneficio, BeneficioTipo, FuncionarioBeneficio, StatusAtivo } from "@/types/rh";
 
@@ -70,7 +70,7 @@ export function useBeneficios() {
     }
 
     if ((count ?? 0) > 0) {
-      return { ok: false, message: "Beneficio possui vinculos. Inative em vez de excluir." };
+      return { ok: false, message: "Benefício possui vínculos. Inative em vez de excluir." };
     }
 
     const { error: dbError } = await kipledDb.from("beneficios" as any).delete().eq("id", id);
@@ -131,3 +131,4 @@ export function useBeneficios() {
     encerrarVinculo,
   };
 }
+

@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -36,32 +36,33 @@ export default function Login() {
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="space-y-3 text-center">
           <div className="flex justify-center mb-2">
-            <img 
-              src="/kiple-logo.png" 
-              alt="Kiple Logo" 
+            <img
+              src="/kiple-logo.png"
+              alt="Logotipo do Kiple RH"
               className="h-16 w-16 rounded-xl object-cover"
             />
           </div>
           <CardTitle className="text-2xl font-bold">Bem-vindo ao Kiple</CardTitle>
           <CardDescription>
-            Grow talent. Reveal stars.
+            Acesse sua conta para continuar.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4" aria-label="Formulário de login">
             {error && (
               <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
+                <AlertCircle className="h-4 w-4" aria-hidden="true" />
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
-            
+
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">E-mail</Label>
               <Input
                 id="email"
                 type="email"
                 placeholder="seu@email.com"
+                title="Digite seu e-mail"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -75,6 +76,7 @@ export default function Login() {
                 id="password"
                 type="password"
                 placeholder="••••••••"
+                title="Digite sua senha"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -82,14 +84,16 @@ export default function Login() {
               />
             </div>
 
-            <Button 
-              type="submit" 
-              className="w-full" 
+            <Button
+              type="submit"
+              className="w-full"
               disabled={loading}
+              title="Entrar na plataforma"
+              aria-label="Entrar na plataforma"
             >
               {loading ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
                   Entrando...
                 </>
               ) : (
@@ -99,7 +103,7 @@ export default function Login() {
           </form>
 
           <div className="mt-6 text-center text-sm text-muted-foreground">
-            <p>Use suas credenciais para acessar a plataforma</p>
+            <p>Use suas credenciais para acessar a plataforma.</p>
           </div>
         </CardContent>
       </Card>

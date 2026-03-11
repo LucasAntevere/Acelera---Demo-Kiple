@@ -51,29 +51,29 @@ export default function DatabaseSetupPage() {
         <div className="bg-card border border-border rounded-xl p-6 card-shadow mb-4">
           <div className="flex items-start gap-3 mb-4">
             <div className="p-2.5 rounded-xl bg-primary/10">
-              <Database className="h-5 w-5 text-primary" />
+              <Database className="h-5 w-5 text-primary" aria-hidden="true" />
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-foreground">Criacao automatica do novo dominio RH</h3>
+              <h3 className="text-sm font-semibold text-foreground">Criação automática do novo domínio RH</h3>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Executa enums, tabelas, constraints, RLS, triggers de data_atualizacao e seeds minimos para o modelo operacional.
+                Executa enums, tabelas, constraints, RLS, triggers de data_atualizacao e seeds mínimos para o modelo operacional.
               </p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div className="bg-muted/30 rounded-lg p-3">
+            <div className="bg-muted/30 rounded-lg p-3" aria-label="Lista de enums que serão criados">
               <p className="text-xs font-semibold text-foreground mb-1">Enums</p>
               {ENUMS.map((e) => <p key={e} className="text-xs text-muted-foreground">{e}</p>)}
             </div>
-            <div className="bg-muted/30 rounded-lg p-3">
+            <div className="bg-muted/30 rounded-lg p-3" aria-label="Lista de tabelas que serão criadas">
               <p className="text-xs font-semibold text-foreground mb-1">Tabelas</p>
               {TABLES.map((t) => <p key={t} className="text-xs text-muted-foreground">{t}</p>)}
             </div>
           </div>
 
-          <Button className="w-full gap-2 h-10" onClick={handleAutoSetup} disabled={running}>
-            {running ? <><Loader2 className="h-4 w-4 animate-spin" /> Executando setup...</> : "Criar schema RH agora"}
+          <Button className="w-full gap-2 h-10" onClick={handleAutoSetup} disabled={running} title="Executar setup automático do banco" aria-label="Executar setup automático do banco">
+            {running ? <><Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> Executando setup...</> : "Criar schema RH agora"}
           </Button>
 
           {result && (
@@ -82,7 +82,7 @@ export default function DatabaseSetupPage() {
               result.success ? "bg-success/5 border-success/20 text-success" : "bg-danger/5 border-danger/20 text-danger"
             )}>
               <div className="flex items-center gap-1.5 font-medium mb-1">
-                {result.success ? <CheckCircle2 className="h-3.5 w-3.5" /> : <AlertTriangle className="h-3.5 w-3.5" />}
+                {result.success ? <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" /> : <AlertTriangle className="h-3.5 w-3.5" aria-hidden="true" />}
                 {result.message}
               </div>
               {result.details && result.details.length > 0 && (
@@ -98,11 +98,11 @@ export default function DatabaseSetupPage() {
 
         <div className="bg-card border border-border rounded-xl p-5 card-shadow">
           <p className="text-xs text-muted-foreground mb-3">
-            Se preferir, voce pode executar manualmente no SQL Editor do projeto Supabase.
+            Se preferir, você pode executar manualmente no SQL Editor do projeto Supabase.
           </p>
-          <a href={KIPLE_DASHBOARD_URL} target="_blank" rel="noopener noreferrer">
-            <Button variant="outline" size="sm" className="h-8 text-xs gap-1.5">
-              <ExternalLink className="h-3.5 w-3.5" /> Abrir SQL Editor
+          <a href={KIPLE_DASHBOARD_URL} target="_blank" rel="noopener noreferrer" aria-label="Abrir SQL Editor do Supabase">
+            <Button variant="outline" size="sm" className="h-8 text-xs gap-1.5" title="Abrir SQL Editor do Supabase">
+              <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" /> Abrir SQL Editor
             </Button>
           </a>
         </div>

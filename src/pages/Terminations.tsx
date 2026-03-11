@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+﻿import { useMemo, useState } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -80,30 +80,30 @@ export default function TerminationsPage() {
   };
 
   return (
-    <DashboardLayout title="Desligamentos" subtitle="Gestao completa do processo de desligamento">
+    <DashboardLayout title="Desligamentos" subtitle="Gestão completa do processo de desligamento">
       <div className="flex items-center justify-between mb-4">
         <div>
           <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
             Desligamentos
-            {loading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
+            {loading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" aria-label="Carregando desligamentos" />}
           </h2>
           <p className="text-sm text-muted-foreground mt-0.5">{desligamentos.length} registros</p>
         </div>
-        <Button size="sm" className="h-8 text-xs gap-1.5" onClick={openCreate}><Plus className="h-3.5 w-3.5" /> Novo Desligamento</Button>
+        <Button size="sm" className="h-8 text-xs gap-1.5" onClick={openCreate} title="Registrar novo desligamento" aria-label="Registrar novo desligamento"><Plus className="h-3.5 w-3.5" aria-hidden="true" /> Novo Desligamento</Button>
       </div>
 
       <div className="bg-card border border-border rounded-xl p-4 card-shadow mb-4 space-y-3">
         <div>
-          <Label className="text-xs text-muted-foreground">Buscar por funcionario</Label>
+          <Label htmlFor="desligamento-search" className="text-xs text-muted-foreground">Buscar por funcionário</Label>
           <div className="relative mt-1.5">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input placeholder="Digite o nome" className="pl-9 h-9 text-sm" value={search} onChange={(e) => setSearch(e.target.value)} />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden="true" />
+            <Input id="desligamento-search" placeholder="Digite o nome" className="pl-9 h-9 text-sm" value={search} onChange={(e) => setSearch(e.target.value)} title="Busca por nome do funcionário" aria-label="Busca por nome do funcionário" />
           </div>
         </div>
         <div>
           <Label className="text-xs text-muted-foreground">Filtrar por tipo de desligamento</Label>
           <Select value={tipoFilter} onValueChange={(v: any) => setTipoFilter(v)}>
-            <SelectTrigger className="h-9 text-sm mt-1.5"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="h-9 text-sm mt-1.5" aria-label="Filtro por tipo de desligamento"><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos os tipos</SelectItem>
               {TIPO_DESLIGAMENTO_OPTIONS.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
@@ -117,11 +117,11 @@ export default function TerminationsPage() {
           <h3 className="text-sm font-semibold text-foreground">{editing ? "Editar Desligamento" : "Novo Desligamento"}</h3>
 
           <div>
-            <Label className="text-xs text-muted-foreground">Funcionario</Label>
+            <Label className="text-xs text-muted-foreground">Funcionário</Label>
             <Select value={String(form.funcionario_id || 0)} onValueChange={(v) => setForm({ ...form, funcionario_id: Number(v) })}>
-              <SelectTrigger className="mt-1.5"><SelectValue placeholder="Selecione o funcionario" /></SelectTrigger>
+              <SelectTrigger className="mt-1.5" aria-label="Selecionar funcionário"><SelectValue placeholder="Selecione o funcionário" /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="0">Selecione o funcionario</SelectItem>
+                <SelectItem value="0">Selecione o funcionário</SelectItem>
                 {funcionarios.map((f) => <SelectItem key={f.id} value={String(f.id)}>{f.nome}</SelectItem>)}
               </SelectContent>
             </Select>
@@ -130,7 +130,7 @@ export default function TerminationsPage() {
           <div>
             <Label className="text-xs text-muted-foreground">Motivo de desligamento</Label>
             <Select value={String(form.motivo_desligamento_id || 0)} onValueChange={(v) => setForm({ ...form, motivo_desligamento_id: Number(v) })}>
-              <SelectTrigger className="mt-1.5"><SelectValue placeholder="Selecione o motivo" /></SelectTrigger>
+              <SelectTrigger className="mt-1.5" aria-label="Selecionar motivo de desligamento"><SelectValue placeholder="Selecione o motivo" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="0">Selecione o motivo</SelectItem>
                 {motivos.filter((m) => m.status === "ativo").map((m) => <SelectItem key={m.id} value={String(m.id)}>{m.nome}</SelectItem>)}
@@ -141,50 +141,50 @@ export default function TerminationsPage() {
           <div>
             <Label className="text-xs text-muted-foreground">Tipo de desligamento</Label>
             <Select value={form.tipo_desligamento} onValueChange={(v: any) => setForm({ ...form, tipo_desligamento: v })}>
-              <SelectTrigger className="mt-1.5"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="mt-1.5" aria-label="Tipo de desligamento"><SelectValue /></SelectTrigger>
               <SelectContent>{TIPO_DESLIGAMENTO_OPTIONS.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
             </Select>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
-              <Label className="text-xs text-muted-foreground">Data do pedido</Label>
-              <Input className="mt-1.5" type="date" value={form.data_pedido} onChange={(e) => setForm({ ...form, data_pedido: e.target.value })} />
+              <Label htmlFor="data-pedido" className="text-xs text-muted-foreground">Data do pedido</Label>
+              <Input id="data-pedido" className="mt-1.5" type="date" value={form.data_pedido} onChange={(e) => setForm({ ...form, data_pedido: e.target.value })} title="Data em que o desligamento foi solicitado" />
             </div>
             <div>
-              <Label className="text-xs text-muted-foreground">Data prevista de saida</Label>
-              <Input className="mt-1.5" type="date" value={form.data_prevista_saida ?? ""} onChange={(e) => setForm({ ...form, data_prevista_saida: e.target.value || null })} />
+              <Label htmlFor="data-prevista" className="text-xs text-muted-foreground">Data prevista de saída</Label>
+              <Input id="data-prevista" className="mt-1.5" type="date" value={form.data_prevista_saida ?? ""} onChange={(e) => setForm({ ...form, data_prevista_saida: e.target.value || null })} title="Data planejada para saída" />
             </div>
             <div>
-              <Label className="text-xs text-muted-foreground">Data efetiva de saida</Label>
-              <Input className="mt-1.5" type="date" value={form.data_efetiva_saida ?? ""} onChange={(e) => setForm({ ...form, data_efetiva_saida: e.target.value || null })} />
+              <Label htmlFor="data-efetiva" className="text-xs text-muted-foreground">Data efetiva de saída</Label>
+              <Input id="data-efetiva" className="mt-1.5" type="date" value={form.data_efetiva_saida ?? ""} onChange={(e) => setForm({ ...form, data_efetiva_saida: e.target.value || null })} title="Data real de saída" />
             </div>
           </div>
 
           <div>
-            <Label className="text-xs text-muted-foreground">Responsavel pelo registro</Label>
-            <Input className="mt-1.5" placeholder="Ex.: RH Operacoes" value={form.responsavel_registro} onChange={(e) => setForm({ ...form, responsavel_registro: e.target.value })} />
+            <Label htmlFor="responsavel-registro" className="text-xs text-muted-foreground">Responsável pelo registro</Label>
+            <Input id="responsavel-registro" className="mt-1.5" placeholder="Ex.: RH Operações" value={form.responsavel_registro} onChange={(e) => setForm({ ...form, responsavel_registro: e.target.value })} title="Nome de quem registrou o desligamento" />
           </div>
 
           <div>
-            <Label className="text-xs text-muted-foreground">Observacoes</Label>
-            <Input className="mt-1.5" placeholder="Contexto adicional" value={form.observacoes ?? ""} onChange={(e) => setForm({ ...form, observacoes: e.target.value })} />
+            <Label htmlFor="observacoes" className="text-xs text-muted-foreground">Observações</Label>
+            <Input id="observacoes" className="mt-1.5" placeholder="Contexto adicional" value={form.observacoes ?? ""} onChange={(e) => setForm({ ...form, observacoes: e.target.value })} title="Observações adicionais do desligamento" />
           </div>
 
           {errorMsg && <p className="text-xs text-danger">{errorMsg}</p>}
           <div className="flex gap-2 pt-1">
-            <Button size="sm" className="h-8 text-xs" onClick={() => void save()}>Salvar</Button>
-            <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => setFormOpen(false)}>Cancelar</Button>
+            <Button size="sm" className="h-8 text-xs" onClick={() => void save()} title="Salvar desligamento">Salvar</Button>
+            <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => setFormOpen(false)} title="Cancelar edição">Cancelar</Button>
           </div>
         </div>
       )}
 
       <div className="bg-card border border-border rounded-xl card-shadow overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-xs">
+          <table className="w-full text-xs" aria-label="Tabela de desligamentos">
             <thead>
               <tr className="border-b border-border bg-muted/30">
-                <th className="text-left px-4 py-3 text-muted-foreground font-medium">Funcionario</th>
+                <th className="text-left px-4 py-3 text-muted-foreground font-medium">Funcionário</th>
                 <th className="text-left px-4 py-3 text-muted-foreground font-medium">Motivo</th>
                 <th className="text-left px-4 py-3 text-muted-foreground font-medium">Tipo</th>
                 <th className="text-left px-4 py-3 text-muted-foreground font-medium">Pedido</th>
@@ -196,20 +196,20 @@ export default function TerminationsPage() {
             </thead>
             <tbody>
               {filtered.map((d, i) => {
-                const status = d.data_efetiva_saida ? "concluido" : "pendente";
+                const status = d.data_efetiva_saida ? "concluído" : "pendente";
                 return (
                   <tr key={d.id} className={i % 2 === 0 ? "" : "bg-muted/5"}>
-                    <td className="px-4 py-3 font-medium text-foreground">{d.funcionario_nome ?? `Funcionario #${d.funcionario_id}`}</td>
+                    <td className="px-4 py-3 font-medium text-foreground">{d.funcionario_nome ?? `Funcionário #${d.funcionario_id}`}</td>
                     <td className="px-4 py-3 text-muted-foreground">{d.motivo_nome ?? `Motivo #${d.motivo_desligamento_id}`}</td>
                     <td className="px-4 py-3 text-muted-foreground">{d.tipo_desligamento}</td>
                     <td className="px-4 py-3 text-muted-foreground">{dt(d.data_pedido)}</td>
                     <td className="px-4 py-3 text-muted-foreground">{dt(d.data_prevista_saida)}</td>
                     <td className="px-4 py-3 text-muted-foreground">{dt(d.data_efetiva_saida)}</td>
                     <td className="px-4 py-3">
-                      <span className={`text-[11px] px-2 py-0.5 rounded ${status === "concluido" ? "bg-success/10 text-success" : "bg-warning/10 text-warning"}`}>{status}</span>
+                      <span className={`text-[11px] px-2 py-0.5 rounded ${status === "concluído" ? "bg-success/10 text-success" : "bg-warning/10 text-warning"}`}>{status}</span>
                     </td>
                     <td className="px-4 py-3">
-                      <Button size="sm" variant="outline" className="h-7 text-[11px]" onClick={() => openEdit(d)}>Editar</Button>
+                      <Button size="sm" variant="outline" className="h-7 text-[11px]" onClick={() => openEdit(d)} title="Editar desligamento">Editar</Button>
                     </td>
                   </tr>
                 );
