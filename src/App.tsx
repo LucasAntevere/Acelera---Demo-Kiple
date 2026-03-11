@@ -8,6 +8,7 @@ import TeamsPage from "./pages/Teams";
 import EmployeesPage from "./pages/Employees";
 import ReportsPage from "./pages/Reports";
 import SettingsPage from "./pages/Settings";
+import DatabaseSetupPage from "./pages/DatabaseSetup";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ const App = () => (
           <Route path="/funcionarios" element={<EmployeesPage />} />
           <Route path="/relatorios" element={<ReportsPage />} />
           <Route path="/configuracoes" element={<SettingsPage />} />
+          <Route path="/setup-banco" element={<DatabaseSetupPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

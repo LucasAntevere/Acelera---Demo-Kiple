@@ -8,13 +8,16 @@ import type { Employee, Team, Alert, ChartPoint } from "@/types/kiple";
 
 export type ConnectionStatus = "checking" | "connected" | "no-tables" | "error";
 
+export interface DeptEngagement { name: string; value: number; color: string; }
+export interface PerfDist { name: string; value: number; color: string; }
+
 export interface KipleData {
   employees: Employee[];
   teams: Team[];
   engagementTrend: ChartPoint[];
   turnoverTrend: ChartPoint[];
-  departmentEngagement: { name: string; value: number; color: string }[];
-  performanceDistribution: { name: string; value: number; color: string }[];
+  departmentEngagement: DeptEngagement[];
+  performanceDistribution: PerfDist[];
   alerts: Alert[];
   connectionStatus: ConnectionStatus;
   isUsingMock: boolean;
@@ -44,6 +47,10 @@ export function useKipleData(): KipleData {
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>("checking");
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [teams, setTeams] = useState<Team[]>([]);
+  const [engHistory, setEngHistory] = useState<ChartPoint[]>([]);
+  const [turnHistory, setTurnHistory] = useState<ChartPoint[]>([]);
+  const [deptColors, setDeptColors] = useState<Record<string, string>>({});
+  const [liveAlerts, setLiveAlerts] = useState<Alert[]>([]);
   const [loading, setLoading] = useState(true);
   const [tick, setTick] = useState(0);
 
@@ -55,28 +62,25 @@ export function useKipleData(): KipleData {
     async function load() {
       setLoading(true);
       try {
-        // Try to fetch employees table
+        // ── 1. Try employees (primary health check) ──────────
         const { data: empData, error: empError } = await kipledDb
           .from("employees" as any)
           .select("*")
-          .limit(200);
+          .eq("active", true)
+          .limit(500);
 
         if (cancelled) return;
 
         if (empError) {
-          // Table doesn't exist or no access
-          if (empError.code === "42P01" || empError.message?.includes("relation") || empError.message?.includes("does not exist")) {
-            setConnectionStatus("no-tables");
-          } else {
-            setConnectionStatus("error");
-          }
-          setEmployees([]);
-          setTeams([]);
+          const isNoTable = empError.code === "42P01"
+            || empError.message?.includes("relation")
+            || empError.message?.includes("does not exist");
+          setConnectionStatus(isNoTable ? "no-tables" : "error");
           setLoading(false);
           return;
         }
 
-        // Employees table exists — connection is live
+        // Map employees
         const mapped: Employee[] = (empData || []).map((row: any, i: number) => ({
           id: row.id ?? i,
           name: row.name ?? row.nome ?? "—",
@@ -87,7 +91,7 @@ export function useKipleData(): KipleData {
           engagementScore: row.engagement_score ?? row.engajamento ?? 0,
           turnoverRisk: mapRisk(row.turnover_risk ?? row.risco_turnover ?? "low"),
           performance: mapPerf(row.performance ?? "medium"),
-          turnoverCost: row.turnover_cost ?? row.custo_turnover ?? 0,
+          turnoverCost: Number(row.turnover_cost ?? row.custo_turnover ?? 0),
           email: row.email ?? "",
           joinDate: row.join_date ?? row.data_admissao ?? "",
           lastSurvey: row.last_survey ?? row.ultima_pesquisa ?? "",
@@ -96,30 +100,90 @@ export function useKipleData(): KipleData {
           avatar: row.avatar,
         }));
 
-        setEmployees(mapped);
+        if (!cancelled) setEmployees(mapped);
 
-        // Try teams table
+        // ── 2. Teams ─────────────────────────────────────────
         const { data: teamsData } = await kipledDb
           .from("teams" as any)
           .select("*")
-          .limit(100);
+          .limit(200);
 
-        if (!cancelled) {
-          const mappedTeams: Team[] = (teamsData || []).map((row: any, i: number) => ({
+        if (!cancelled && teamsData) {
+          setTeams(teamsData.map((row: any, i: number) => ({
             id: row.id ?? i,
             name: row.name ?? row.nome ?? "—",
             department: row.department ?? row.departamento ?? "—",
             lead: row.lead ?? row.lider ?? "—",
             size: row.size ?? row.tamanho ?? 0,
-            engagementAvg: row.engagement_avg ?? row.engajamento_medio ?? 0,
-            turnoverRate: row.turnover_rate ?? row.taxa_turnover ?? 0,
+            engagementAvg: Number(row.engagement_avg ?? row.engajamento_medio ?? 0),
+            turnoverRate: Number(row.turnover_rate ?? row.taxa_turnover ?? 0),
             performance: mapPerf(row.performance ?? "medium"),
             atRiskCount: row.at_risk_count ?? row.em_risco ?? 0,
-          }));
-          setTeams(mappedTeams);
-          setConnectionStatus("connected");
+          })));
         }
-      } catch (err) {
+
+        // ── 3. Engagement history ─────────────────────────────
+        const { data: engData } = await kipledDb
+          .from("engagement_history" as any)
+          .select("month, value, target")
+          .order("year", { ascending: true })
+          .order("id", { ascending: true })
+          .limit(12);
+
+        if (!cancelled && engData && engData.length > 0) {
+          setEngHistory(engData.map((r: any) => ({
+            month: r.month,
+            value: Number(r.value ?? 0),
+            secondary: Number(r.target ?? 0),
+          })));
+        }
+
+        // ── 4. Turnover history ───────────────────────────────
+        const { data: turnData } = await kipledDb
+          .from("turnover_history" as any)
+          .select("month, rate")
+          .order("year", { ascending: true })
+          .order("id", { ascending: true })
+          .limit(12);
+
+        if (!cancelled && turnData && turnData.length > 0) {
+          setTurnHistory(turnData.map((r: any) => ({
+            month: r.month,
+            value: Number(r.rate ?? 0),
+          })));
+        }
+
+        // ── 5. Departments (colors) ───────────────────────────
+        const { data: deptData } = await kipledDb
+          .from("departments" as any)
+          .select("name, color");
+
+        if (!cancelled && deptData) {
+          const colorMap: Record<string, string> = {};
+          deptData.forEach((d: any) => { colorMap[d.name] = d.color ?? "#6366F1"; });
+          setDeptColors(colorMap);
+        }
+
+        // ── 6. Alerts ─────────────────────────────────────────
+        const { data: alertData } = await kipledDb
+          .from("alerts" as any)
+          .select("*")
+          .order("created_at", { ascending: false })
+          .limit(10);
+
+        if (!cancelled && alertData && alertData.length > 0) {
+          setLiveAlerts(alertData.map((r: any) => ({
+            id: String(r.id),
+            type: r.type as Alert["type"],
+            title: r.title,
+            message: r.message ?? "",
+            timestamp: r.timestamp ?? "agora",
+            read: r.read ?? false,
+          })));
+        }
+
+        if (!cancelled) setConnectionStatus("connected");
+      } catch {
         if (!cancelled) setConnectionStatus("error");
       } finally {
         if (!cancelled) setLoading(false);
@@ -131,13 +195,18 @@ export function useKipleData(): KipleData {
   }, [tick]);
 
   const isUsingMock = connectionStatus !== "connected";
+
+  // Use real data when connected, fallback to mock
   const finalEmployees = isUsingMock ? mockEmployees : employees;
   const finalTeams = isUsingMock ? mockTeams : teams;
+  const finalEngHistory = (isUsingMock || engHistory.length === 0) ? engagementTrend : engHistory;
+  const finalTurnHistory = (isUsingMock || turnHistory.length === 0) ? turnoverTrend : turnHistory;
+  const finalAlerts = (isUsingMock || liveAlerts.length === 0) ? mockAlerts : liveAlerts;
 
-  // Derive chart data from real employees if connected
-  const deptEngagement = connectionStatus === "connected" && employees.length > 0
+  // Dept engagement from real data
+  const finalDeptEngagement = connectionStatus === "connected" && finalEmployees.length > 0
     ? Object.entries(
-        employees.reduce((acc: Record<string, number[]>, e) => {
+        finalEmployees.reduce((acc: Record<string, number[]>, e) => {
           if (!acc[e.department]) acc[e.department] = [];
           acc[e.department].push(e.engagementScore);
           return acc;
@@ -145,27 +214,27 @@ export function useKipleData(): KipleData {
       ).map(([name, scores]) => ({
         name,
         value: Math.round(scores.reduce((a, b) => a + b, 0) / scores.length),
-        color: DEPT_COLORS[name] ?? "#6366F1",
+        color: deptColors[name] ?? DEPT_COLORS[name] ?? "#6366F1",
       }))
     : departmentEngagement;
 
-  const perfDist = connectionStatus === "connected" && employees.length > 0
+  const finalPerfDist = connectionStatus === "connected" && finalEmployees.length > 0
     ? [
-        { name: "Estrelas", value: employees.filter(e => e.performance === "star").length, color: "#2563EB" },
-        { name: "Alto", value: employees.filter(e => e.performance === "high").length, color: "#10B981" },
-        { name: "Médio", value: employees.filter(e => e.performance === "medium").length, color: "#F59E0B" },
-        { name: "Baixo", value: employees.filter(e => e.performance === "low").length, color: "#EF4444" },
+        { name: "Estrelas", value: finalEmployees.filter(e => e.performance === "star").length, color: "#2563EB" },
+        { name: "Alto",     value: finalEmployees.filter(e => e.performance === "high").length, color: "#10B981" },
+        { name: "Médio",    value: finalEmployees.filter(e => e.performance === "medium").length, color: "#F59E0B" },
+        { name: "Baixo",    value: finalEmployees.filter(e => e.performance === "low").length, color: "#EF4444" },
       ]
     : performanceDistribution;
 
   return {
     employees: finalEmployees,
     teams: finalTeams,
-    engagementTrend,
-    turnoverTrend,
-    departmentEngagement: deptEngagement,
-    performanceDistribution: perfDist,
-    alerts: mockAlerts,
+    engagementTrend: finalEngHistory,
+    turnoverTrend: finalTurnHistory,
+    departmentEngagement: finalDeptEngagement,
+    performanceDistribution: finalPerfDist,
+    alerts: finalAlerts,
     connectionStatus,
     isUsingMock,
     loading,
