@@ -2,29 +2,19 @@ import { Bell, Search, SlidersHorizontal } from "lucide-react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { mockAlerts } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 
-const alertIconColor: Record<string, string> = {
-  danger: "text-danger",
-  warning: "text-warning",
-  info: "text-primary",
-  success: "text-success",
-};
-
-const alertDotColor: Record<string, string> = {
-  danger: "bg-danger",
-  warning: "bg-warning",
-  info: "bg-primary",
-  success: "bg-success",
-};
+const rhAlerts = [
+  { id: "1", title: "Cadastro pendente", message: "2 funcionarios sem endereco completo.", read: false },
+  { id: "2", title: "Beneficio para revisar", message: "1 beneficio inativo ainda com solicitacoes.", read: false },
+  { id: "3", title: "Desligamentos do mes", message: "Confira os desligamentos previstos para esta semana.", read: true },
+];
 
 interface AppHeaderProps {
   title: string;
@@ -32,7 +22,7 @@ interface AppHeaderProps {
 }
 
 export function AppHeader({ title, subtitle }: AppHeaderProps) {
-  const unreadCount = mockAlerts.filter((a) => !a.read).length;
+  const unreadCount = rhAlerts.filter((a) => !a.read).length;
 
   return (
     <header className="h-14 flex items-center justify-between border-b border-border bg-card px-4 gap-4 sticky top-0 z-10">
@@ -45,22 +35,19 @@ export function AppHeader({ title, subtitle }: AppHeaderProps) {
       </div>
 
       <div className="flex items-center gap-2">
-        {/* Search */}
         <div className="relative hidden md:flex items-center">
           <Search className="absolute left-2.5 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
           <Input
-            placeholder="Buscar funcionários, equipes..."
-            className="pl-8 h-8 w-56 text-xs bg-muted border-0 focus-visible:ring-1 focus-visible:ring-ring"
+            placeholder="Buscar funcionarios, beneficios, desligamentos..."
+            className="pl-8 h-8 w-72 text-xs bg-muted border-0 focus-visible:ring-1 focus-visible:ring-ring"
           />
         </div>
 
-        {/* Filter Button */}
         <Button variant="outline" size="sm" className="h-8 text-xs gap-1.5 hidden sm:flex">
           <SlidersHorizontal className="h-3.5 w-3.5" />
           Filtros
         </Button>
 
-        {/* Notifications */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="relative h-8 w-8">
@@ -74,16 +61,15 @@ export function AppHeader({ title, subtitle }: AppHeaderProps) {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-80 dropdown-shadow">
             <div className="px-3 py-2 border-b border-border">
-              <p className="text-sm font-semibold">Alertas</p>
-              <p className="text-xs text-muted-foreground">{unreadCount} não lidos</p>
+              <p className="text-sm font-semibold">Alertas RH</p>
+              <p className="text-xs text-muted-foreground">{unreadCount} nao lidos</p>
             </div>
-            {mockAlerts.map((alert) => (
+            {rhAlerts.map((alert) => (
               <DropdownMenuItem key={alert.id} className="flex items-start gap-2.5 py-2.5 px-3 cursor-pointer">
-                <div className={cn("mt-1 h-2 w-2 rounded-full flex-shrink-0", alertDotColor[alert.type])} />
+                <div className={cn("mt-1 h-2 w-2 rounded-full flex-shrink-0", alert.read ? "bg-muted-foreground" : "bg-primary")} />
                 <div className="min-w-0">
                   <p className={cn("text-xs font-medium", alert.read ? "text-muted-foreground" : "text-foreground")}>{alert.title}</p>
-                  <p className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed line-clamp-2">{alert.message}</p>
-                  <p className="text-[10px] text-muted-foreground/60 mt-1">{alert.timestamp}</p>
+                  <p className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed">{alert.message}</p>
                 </div>
               </DropdownMenuItem>
             ))}

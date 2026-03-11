@@ -1,140 +1,113 @@
+import { useState } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Bell, Shield, Building, Users, Palette, Save } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { STATUS_OPTIONS, type MotivoDesligamento, type StatusAtivo } from "@/types/rh";
+import { useMotivosDesligamento, type MotivoInput } from "@/hooks/useMotivosDesligamento";
+import { Link } from "react-router-dom";
 
-const sections = [
-  { id: "company", label: "Empresa", icon: <Building className="h-4 w-4" /> },
-  { id: "team", label: "Equipe", icon: <Users className="h-4 w-4" /> },
-  { id: "notifications", label: "Notificações", icon: <Bell className="h-4 w-4" /> },
-  { id: "security", label: "Segurança", icon: <Shield className="h-4 w-4" /> },
-  { id: "appearance", label: "Aparência", icon: <Palette className="h-4 w-4" /> },
-];
+const EMPTY_FORM: MotivoInput = {
+  nome: "",
+  descricao: "",
+  status: "ativo",
+};
 
 export default function SettingsPage() {
+  const { motivos, criarMotivo, atualizarMotivo } = useMotivosDesligamento();
+  const [editing, setEditing] = useState<MotivoDesligamento | null>(null);
+  const [form, setForm] = useState<MotivoInput>(EMPTY_FORM);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  const openCreate = () => {
+    setEditing(null);
+    setForm(EMPTY_FORM);
+    setErrorMsg(null);
+  };
+
+  const openEdit = (m: MotivoDesligamento) => {
+    setEditing(m);
+    setForm({ nome: m.nome, descricao: m.descricao, status: m.status });
+    setErrorMsg(null);
+  };
+
+  const save = async () => {
+    const result = editing ? await atualizarMotivo(editing.id, form) : await criarMotivo(form);
+    if (!result.ok) {
+      setErrorMsg(result.message ?? "Erro ao salvar motivo");
+      return;
+    }
+    setEditing(null);
+    setForm(EMPTY_FORM);
+  };
+
   return (
-    <DashboardLayout title="Configurações" subtitle="Preferências e configurações da conta">
-      <div className="flex items-start gap-6">
-        {/* Sidebar nav */}
-        <nav className="hidden md:flex flex-col gap-1 w-44 flex-shrink-0">
-          {sections.map((s) => (
-            <button
-              key={s.id}
-              className={cn(
-                "flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors text-left",
-                s.id === "company"
-                  ? "bg-primary/10 text-primary font-medium"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
-              )}
-            >
-              {s.icon}
-              {s.label}
-            </button>
-          ))}
-        </nav>
+    <DashboardLayout title="Configuracoes" subtitle="Preferencias gerais e motivos de desligamento">
+      <div className="bg-card border border-border rounded-xl p-5 card-shadow mb-4">
+        <h3 className="text-sm font-semibold text-foreground mb-2">Ajustes do sistema</h3>
+        <p className="text-xs text-muted-foreground mb-3">
+          O foco desta fase e o dominio operacional de RH. Para bootstrap do banco com o novo schema, use a pagina de setup.
+        </p>
+        <Link to="/setup-banco"><Button size="sm" variant="outline" className="h-8 text-xs">Abrir Setup do Banco</Button></Link>
+      </div>
 
-        {/* Content */}
-        <div className="flex-1 space-y-4">
-          {/* Company Info */}
-          <div className="bg-card border border-border rounded-xl p-5 card-shadow">
-            <h3 className="text-sm font-semibold text-foreground mb-4">Informações da Empresa</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {[
-                { label: "Nome da Empresa", defaultValue: "TechCorp Brasil", type: "text" },
-                { label: "Setor", defaultValue: "Tecnologia", type: "text" },
-                { label: "Tamanho da Equipe", defaultValue: "58 funcionários", type: "text" },
-                { label: "País", defaultValue: "Brasil", type: "text" },
-              ].map((field) => (
-                <div key={field.label}>
-                  <Label className="text-xs text-muted-foreground mb-1.5 block">{field.label}</Label>
-                  <Input defaultValue={field.defaultValue} className="h-8 text-sm" />
-                </div>
+      <div className="bg-card border border-border rounded-xl p-5 card-shadow mb-4 space-y-3">
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-semibold text-foreground">Motivos de desligamento</h3>
+          <Button size="sm" className="h-8 text-xs" onClick={openCreate}>Novo Motivo</Button>
+        </div>
+
+        <div>
+          <Label className="text-xs text-muted-foreground">Nome</Label>
+          <Input className="mt-1.5" placeholder="Ex.: Pedido do funcionario" value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} />
+        </div>
+
+        <div>
+          <Label className="text-xs text-muted-foreground">Descricao</Label>
+          <Input className="mt-1.5" placeholder="Descreva o motivo" value={form.descricao} onChange={(e) => setForm({ ...form, descricao: e.target.value })} />
+        </div>
+
+        <div>
+          <Label className="text-xs text-muted-foreground">Status</Label>
+          <Select value={form.status} onValueChange={(v: StatusAtivo) => setForm({ ...form, status: v })}>
+            <SelectTrigger className="mt-1.5"><SelectValue /></SelectTrigger>
+            <SelectContent>{STATUS_OPTIONS.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+          </Select>
+        </div>
+
+        {errorMsg && <p className="text-xs text-danger">{errorMsg}</p>}
+
+        <div className="flex gap-2 pt-1">
+          <Button size="sm" className="h-8 text-xs" onClick={() => void save()}>{editing ? "Atualizar" : "Salvar"}</Button>
+          {editing && <Button size="sm" variant="outline" className="h-8 text-xs" onClick={openCreate}>Cancelar edicao</Button>}
+        </div>
+      </div>
+
+      <div className="bg-card border border-border rounded-xl card-shadow overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs">
+            <thead>
+              <tr className="border-b border-border bg-muted/30">
+                <th className="text-left px-4 py-3 text-muted-foreground font-medium">Nome</th>
+                <th className="text-left px-4 py-3 text-muted-foreground font-medium">Descricao</th>
+                <th className="text-left px-4 py-3 text-muted-foreground font-medium">Status</th>
+                <th className="px-4 py-3" />
+              </tr>
+            </thead>
+            <tbody>
+              {motivos.map((m, i) => (
+                <tr key={m.id} className={i % 2 === 0 ? "" : "bg-muted/5"}>
+                  <td className="px-4 py-3 font-medium text-foreground">{m.nome}</td>
+                  <td className="px-4 py-3 text-muted-foreground">{m.descricao}</td>
+                  <td className="px-4 py-3 text-muted-foreground">{m.status}</td>
+                  <td className="px-4 py-3">
+                    <Button size="sm" variant="outline" className="h-7 text-[11px]" onClick={() => openEdit(m)}>Editar</Button>
+                  </td>
+                </tr>
               ))}
-            </div>
-            <div className="mt-4">
-              <Label className="text-xs text-muted-foreground mb-1.5 block">Metas de Engajamento</Label>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                {[
-                  { label: "Engajamento Mínimo (%)", value: "75" },
-                  { label: "Meta de Turnover (%)", value: "10" },
-                  { label: "NPS Mínimo", value: "7.5" },
-                ].map((goal) => (
-                  <div key={goal.label}>
-                    <Label className="text-[11px] text-muted-foreground mb-1 block">{goal.label}</Label>
-                    <Input defaultValue={goal.value} className="h-8 text-sm" type="number" />
-                  </div>
-                ))}
-              </div>
-            </div>
-            <Button size="sm" className="h-8 text-xs mt-4 gap-1.5">
-              <Save className="h-3.5 w-3.5" />
-              Salvar Alterações
-            </Button>
-          </div>
-
-          {/* Notifications */}
-          <div className="bg-card border border-border rounded-xl p-5 card-shadow">
-            <h3 className="text-sm font-semibold text-foreground mb-4">Notificações</h3>
-            <div className="space-y-3">
-              {[
-                { label: "Alertas de turnover em tempo real", description: "Quando um funcionário atinge risco alto", on: true },
-                { label: "Relatórios mensais automáticos", description: "Enviados no primeiro dia de cada mês", on: true },
-                { label: "Resumo semanal por email", description: "Resumo de KPIs toda segunda-feira", on: false },
-                { label: "Alertas de engajamento crítico", description: "Quando equipes caem abaixo da meta", on: true },
-                { label: "Novas respostas de pesquisa", description: "Notificação ao receber novas respostas", on: false },
-              ].map((item) => (
-                <div key={item.label} className="flex items-center justify-between py-2 border-b border-border last:border-0">
-                  <div>
-                    <p className="text-sm font-medium text-foreground">{item.label}</p>
-                    <p className="text-xs text-muted-foreground">{item.description}</p>
-                  </div>
-                  <Switch defaultChecked={item.on} />
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Survey settings */}
-          <div className="bg-card border border-border rounded-xl p-5 card-shadow">
-            <h3 className="text-sm font-semibold text-foreground mb-4">Pesquisas de Engajamento</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <Label className="text-xs text-muted-foreground mb-1.5 block">Frequência das Pesquisas</Label>
-                <Select defaultValue="monthly">
-                  <SelectTrigger className="h-8 text-sm">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="weekly">Semanal</SelectItem>
-                    <SelectItem value="biweekly">Quinzenal</SelectItem>
-                    <SelectItem value="monthly">Mensal</SelectItem>
-                    <SelectItem value="quarterly">Trimestral</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label className="text-xs text-muted-foreground mb-1.5 block">Idioma das Pesquisas</Label>
-                <Select defaultValue="pt-br">
-                  <SelectTrigger className="h-8 text-sm">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="pt-br">Português (BR)</SelectItem>
-                    <SelectItem value="en">English</SelectItem>
-                    <SelectItem value="es">Español</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <Button size="sm" className="h-8 text-xs mt-4 gap-1.5">
-              <Save className="h-3.5 w-3.5" />
-              Salvar
-            </Button>
-          </div>
+            </tbody>
+          </table>
         </div>
       </div>
     </DashboardLayout>

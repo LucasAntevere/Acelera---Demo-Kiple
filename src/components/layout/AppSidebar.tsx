@@ -1,6 +1,5 @@
-import { BarChart3, Users, UserCircle, FileText, Settings, LogOut } from "lucide-react";
+﻿import { BarChart3, BriefcaseMedical, Building2, UserCircle2, FileClock, Settings, LogOut } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
-import { useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   Sidebar,
@@ -15,18 +14,16 @@ import {
   SidebarFooter,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { useKipleData } from "@/hooks/useKipleData";
 
 const navItems = [
   { title: "Dashboard", url: "/", icon: BarChart3 },
-  { title: "Equipes", url: "/equipes", icon: Users },
-  { title: "Funcionários", url: "/funcionarios", icon: UserCircle },
-  { title: "Relatórios", url: "/relatorios", icon: FileText },
+  { title: "Funcionarios", url: "/funcionarios", icon: UserCircle2 },
+  { title: "Departamentos", url: "/departamentos", icon: Building2 },
+  { title: "Beneficios", url: "/beneficios", icon: BriefcaseMedical },
+  { title: "Desligamentos", url: "/desligamentos", icon: FileClock },
 ];
 
-const bottomItems = [
-  { title: "Configurações", url: "/configuracoes", icon: Settings },
-];
+const bottomItems = [{ title: "Configuracoes", url: "/configuracoes", icon: Settings }];
 
 export function AppSidebar() {
   const { state } = useSidebar();
@@ -39,18 +36,13 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon" className="border-sidebar-border">
-      {/* Logo */}
       <SidebarHeader className="border-b border-sidebar-border px-4 py-4">
         <div className="flex items-center gap-2.5">
-          <img 
-            src="/kiple-logo.png" 
-            alt="Kiple Logo" 
-            className="h-8 w-8 rounded-lg object-cover flex-shrink-0"
-          />
+          <img src="/kiple-logo.png" alt="Kiple Logo" className="h-8 w-8 rounded-lg object-cover flex-shrink-0" />
           {!collapsed && (
             <div>
-              <span className="text-base font-bold text-sidebar-accent-foreground tracking-tight">Kiple</span>
-              <p className="text-[10px] text-sidebar-foreground leading-none mt-0.5">Grow talent. Reveal stars.</p>
+              <span className="text-base font-bold text-sidebar-accent-foreground tracking-tight">Kiple RH</span>
+              <p className="text-[10px] text-sidebar-foreground leading-none mt-0.5">Operacoes de pessoas</p>
             </div>
           )}
         </div>
@@ -58,7 +50,11 @@ export function AppSidebar() {
 
       <SidebarContent className="py-2">
         <SidebarGroup>
-          {!collapsed && <SidebarGroupLabel className="text-sidebar-foreground/50 text-[10px] uppercase tracking-widest px-4 mb-1">Navegação</SidebarGroupLabel>}
+          {!collapsed && (
+            <SidebarGroupLabel className="text-sidebar-foreground/50 text-[10px] uppercase tracking-widest px-4 mb-1">
+              Navegacao
+            </SidebarGroupLabel>
+          )}
           <SidebarGroupContent>
             <SidebarMenu>
               {navItems.map((item) => (
@@ -103,11 +99,13 @@ export function AppSidebar() {
           <div className="px-3 mt-2 mb-1 space-y-2">
             <div className="flex items-center gap-2.5 p-2.5 rounded-lg bg-sidebar-accent">
               <div className="h-7 w-7 rounded-full bg-sidebar-primary flex items-center justify-center flex-shrink-0">
-                <span className="text-xs font-bold text-sidebar-primary-foreground">{user?.email?.charAt(0).toUpperCase()}</span>
+                <span className="text-xs font-bold text-sidebar-primary-foreground">
+                  {user?.email?.charAt(0).toUpperCase()}
+                </span>
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-xs font-medium text-sidebar-accent-foreground truncate">{user?.email}</p>
-                <p className="text-[10px] text-sidebar-foreground truncate">Usuário</p>
+                <p className="text-[10px] text-sidebar-foreground truncate">Usuario</p>
               </div>
             </div>
             <button
