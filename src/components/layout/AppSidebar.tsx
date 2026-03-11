@@ -1,4 +1,4 @@
-import { BarChart3, Users, UserCircle, FileText, Settings, TrendingDown, Sparkles } from "lucide-react";
+import { BarChart3, Users, UserCircle, FileText, Settings, Sparkles, Database } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import {
@@ -14,6 +14,7 @@ import {
   SidebarFooter,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { useKipleData } from "@/hooks/useKipleData";
 
 const navItems = [
   { title: "Dashboard", url: "/", icon: BarChart3 },
@@ -24,6 +25,7 @@ const navItems = [
 
 const bottomItems = [
   { title: "Configurações", url: "/configuracoes", icon: Settings },
+  { title: "Setup do Banco", url: "/setup-banco", icon: Database },
 ];
 
 export function AppSidebar() {
