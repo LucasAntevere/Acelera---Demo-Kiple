@@ -1,1 +1,4 @@
 project_id = "zcbmveqqbnslhvvzbsxq"
+
+[functions.kiple-setup]
+verify_jwt = false
