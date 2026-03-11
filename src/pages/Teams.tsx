@@ -6,7 +6,6 @@ import { Search, Users, TrendingDown, Activity, AlertTriangle, Loader2 } from "l
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useKipleData } from "@/hooks/useKipleData";
-import { KipleConnectionBanner } from "@/components/KipleConnectionBanner";
 
 export default function TeamsPage() {
   const [search, setSearch] = useState("");
@@ -27,7 +26,6 @@ export default function TeamsPage() {
 
   return (
     <DashboardLayout title="Equipes" subtitle="Gerencie e acompanhe todas as equipes">
-      <KipleConnectionBanner status={connectionStatus} />
 
       <div className="flex items-center justify-between mb-6">
         <div>

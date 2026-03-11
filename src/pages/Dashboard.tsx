@@ -13,7 +13,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useKipleData } from "@/hooks/useKipleData";
-import { KipleConnectionBanner } from "@/components/KipleConnectionBanner";
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
@@ -61,7 +60,6 @@ export default function Dashboard() {
 
   return (
     <DashboardLayout title="Dashboard" subtitle="Visão geral da sua força de trabalho">
-      <KipleConnectionBanner status={connectionStatus} />
 
       {/* Period selector */}
       <div className="flex items-center justify-between mb-6">

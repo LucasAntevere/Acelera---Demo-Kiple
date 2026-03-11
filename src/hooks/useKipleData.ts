@@ -194,14 +194,16 @@ export function useKipleData(): KipleData {
     return () => { cancelled = true; };
   }, [tick]);
 
-  const isUsingMock = connectionStatus !== "connected";
+  // Only use mock data when connection actually failed (not during initial checking)
+  const shouldUseMock = connectionStatus === "error" || connectionStatus === "no-tables";
+  const isUsingMock = shouldUseMock;
 
-  // Use real data when connected, fallback to mock
-  const finalEmployees = isUsingMock ? mockEmployees : employees;
-  const finalTeams = isUsingMock ? mockTeams : teams;
-  const finalEngHistory = (isUsingMock || engHistory.length === 0) ? engagementTrend : engHistory;
-  const finalTurnHistory = (isUsingMock || turnHistory.length === 0) ? turnoverTrend : turnHistory;
-  const finalAlerts = (isUsingMock || liveAlerts.length === 0) ? mockAlerts : liveAlerts;
+  // During checking/loading, show empty arrays. Only use mock if connection failed.
+  const finalEmployees = shouldUseMock ? mockEmployees : employees;
+  const finalTeams = shouldUseMock ? mockTeams : teams;
+  const finalEngHistory = shouldUseMock ? engagementTrend : (engHistory.length === 0 ? [] : engHistory);
+  const finalTurnHistory = shouldUseMock ? turnoverTrend : (turnHistory.length === 0 ? [] : turnHistory);
+  const finalAlerts = shouldUseMock ? mockAlerts : (liveAlerts.length === 0 ? [] : liveAlerts);
 
   // Dept engagement from real data
   const finalDeptEngagement = connectionStatus === "connected" && finalEmployees.length > 0

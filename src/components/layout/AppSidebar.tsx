@@ -1,6 +1,7 @@
-import { BarChart3, Users, UserCircle, FileText, Settings, Sparkles, Database } from "lucide-react";
+import { BarChart3, Users, UserCircle, FileText, Settings, LogOut } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   Sidebar,
   SidebarContent,
@@ -25,27 +26,27 @@ const navItems = [
 
 const bottomItems = [
   { title: "Configurações", url: "/configuracoes", icon: Settings },
-  { title: "Setup do Banco", url: "/setup-banco", icon: Database },
 ];
 
 export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
-  const { connectionStatus } = useKipleData();
+  const { user, signOut } = useAuth();
 
-  const dbStatusColor =
-    connectionStatus === "connected" ? "bg-success" :
-    connectionStatus === "checking"  ? "bg-warning animate-pulse" :
-    "bg-danger";
+  const handleLogout = async () => {
+    await signOut();
+  };
 
   return (
     <Sidebar collapsible="icon" className="border-sidebar-border">
       {/* Logo */}
       <SidebarHeader className="border-b border-sidebar-border px-4 py-4">
         <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-sidebar-primary flex-shrink-0">
-            <Sparkles className="h-4 w-4 text-sidebar-primary-foreground" />
-          </div>
+          <img 
+            src="/kiple-logo.png" 
+            alt="Kiple Logo" 
+            className="h-8 w-8 rounded-lg object-cover flex-shrink-0"
+          />
           {!collapsed && (
             <div>
               <span className="text-base font-bold text-sidebar-accent-foreground tracking-tight">Kiple</span>
@@ -92,9 +93,6 @@ export function AppSidebar() {
                 >
                   <item.icon className="h-4 w-4 flex-shrink-0" />
                   {!collapsed && <span className="text-sm">{item.title}</span>}
-                  {!collapsed && item.url === "/setup-banco" && (
-                    <span className={`ml-auto h-1.5 w-1.5 rounded-full ${dbStatusColor}`} />
-                  )}
                 </NavLink>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -102,17 +100,23 @@ export function AppSidebar() {
         </SidebarMenu>
 
         {!collapsed && (
-          <div className="px-3 mt-2 mb-1">
+          <div className="px-3 mt-2 mb-1 space-y-2">
             <div className="flex items-center gap-2.5 p-2.5 rounded-lg bg-sidebar-accent">
               <div className="h-7 w-7 rounded-full bg-sidebar-primary flex items-center justify-center flex-shrink-0">
-                <span className="text-xs font-bold text-sidebar-primary-foreground">HR</span>
+                <span className="text-xs font-bold text-sidebar-primary-foreground">{user?.email?.charAt(0).toUpperCase()}</span>
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-xs font-medium text-sidebar-accent-foreground truncate">Maria Santos</p>
-                <p className="text-[10px] text-sidebar-foreground truncate">HR Manager</p>
+                <p className="text-xs font-medium text-sidebar-accent-foreground truncate">{user?.email}</p>
+                <p className="text-[10px] text-sidebar-foreground truncate">Usuário</p>
               </div>
-              <div className={`h-2 w-2 rounded-full flex-shrink-0 ${dbStatusColor}`} title={`Banco: ${connectionStatus}`} />
             </div>
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center gap-2 px-3 py-2 text-xs rounded-lg text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
+            >
+              <LogOut className="h-3.5 w-3.5" />
+              Sair
+            </button>
           </div>
         )}
       </SidebarFooter>

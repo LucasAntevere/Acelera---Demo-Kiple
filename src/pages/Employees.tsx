@@ -8,7 +8,6 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import type { Employee } from "@/types/kiple";
 import { useKipleData } from "@/hooks/useKipleData";
-import { KipleConnectionBanner } from "@/components/KipleConnectionBanner";
 
 function EmployeeDetail({ employee, onClose }: { employee: Employee; onClose: () => void }) {
   const recommendations = employee.performance === "star"
@@ -99,8 +98,6 @@ export default function EmployeesPage() {
   return (
     <DashboardLayout title="Funcionários" subtitle="Perfis individuais e análise de risco">
       {selected && <EmployeeDetail employee={selected} onClose={() => setSelected(null)} />}
-
-      <KipleConnectionBanner status={connectionStatus} />
 
       <div className="flex items-center justify-between mb-6">
         <div>
