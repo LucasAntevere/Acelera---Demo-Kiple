@@ -1,13 +1,14 @@
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { mockEmployees } from "@/lib/mock-data";
 import { RiskBadge, PerformanceBadge, EngagementBar } from "@/components/metrics/StatusBadges";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, UserPlus, ChevronRight } from "lucide-react";
+import { Search, UserPlus, ChevronRight, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import type { Employee } from "@/types/kiple";
+import { useKipleData } from "@/hooks/useKipleData";
+import { KipleConnectionBanner } from "@/components/KipleConnectionBanner";
 
 function EmployeeDetail({ employee, onClose }: { employee: Employee; onClose: () => void }) {
   const recommendations = employee.performance === "star"
@@ -19,7 +20,6 @@ function EmployeeDetail({ employee, onClose }: { employee: Employee; onClose: ()
   return (
     <div className="fixed inset-0 bg-foreground/20 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div className="bg-card border border-border rounded-2xl p-6 w-full max-w-md card-shadow animate-slide-in" onClick={e => e.stopPropagation()}>
-        {/* Header */}
         <div className="flex items-center gap-3 mb-5">
           <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
             <span className="text-sm font-bold text-primary">
@@ -33,7 +33,6 @@ function EmployeeDetail({ employee, onClose }: { employee: Employee; onClose: ()
           <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors p-1">✕</button>
         </div>
 
-        {/* Metrics */}
         <div className="grid grid-cols-2 gap-3 mb-4">
           {[
             { label: "Engajamento", value: `${employee.engagementScore}%`, color: employee.engagementScore >= 80 ? "text-success" : employee.engagementScore >= 65 ? "text-warning" : "text-danger" },
@@ -48,7 +47,6 @@ function EmployeeDetail({ employee, onClose }: { employee: Employee; onClose: ()
           ))}
         </div>
 
-        {/* Risk & Performance */}
         <div className="flex items-center gap-2 mb-4 p-3 bg-muted/30 rounded-lg">
           <div className="flex-1">
             <p className="text-xs text-muted-foreground mb-1">Risco de Turnover</p>
@@ -60,13 +58,11 @@ function EmployeeDetail({ employee, onClose }: { employee: Employee; onClose: ()
           </div>
         </div>
 
-        {/* Engagement bar */}
         <div className="mb-4">
           <p className="text-xs text-muted-foreground mb-1.5">Score de Engajamento</p>
           <EngagementBar score={employee.engagementScore} />
         </div>
 
-        {/* Recommendations */}
         <div className="bg-muted/30 rounded-lg p-3">
           <p className="text-xs font-semibold text-foreground mb-2">Ações Recomendadas</p>
           <ul className="space-y-1.5">
@@ -90,7 +86,9 @@ export default function EmployeesPage() {
   const [riskFilter, setRiskFilter] = useState("all");
   const [selected, setSelected] = useState<Employee | null>(null);
 
-  const filtered = mockEmployees.filter(e => {
+  const { employees, connectionStatus, loading } = useKipleData();
+
+  const filtered = employees.filter(e => {
     const matchSearch = e.name.toLowerCase().includes(search.toLowerCase()) ||
       e.department.toLowerCase().includes(search.toLowerCase()) ||
       e.position.toLowerCase().includes(search.toLowerCase());
@@ -102,10 +100,15 @@ export default function EmployeesPage() {
     <DashboardLayout title="Funcionários" subtitle="Perfis individuais e análise de risco">
       {selected && <EmployeeDetail employee={selected} onClose={() => setSelected(null)} />}
 
+      <KipleConnectionBanner status={connectionStatus} />
+
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-xl font-bold text-foreground">Funcionários</h2>
-          <p className="text-sm text-muted-foreground mt-0.5">{mockEmployees.length} registros ativos</p>
+          <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
+            Funcionários
+            {loading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
+          </h2>
+          <p className="text-sm text-muted-foreground mt-0.5">{employees.length} registros ativos</p>
         </div>
         <Button size="sm" className="h-8 text-xs gap-1.5">
           <UserPlus className="h-3.5 w-3.5" />
@@ -113,7 +116,6 @@ export default function EmployeesPage() {
         </Button>
       </div>
 
-      {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3 mb-4">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -132,7 +134,6 @@ export default function EmployeesPage() {
         </Select>
       </div>
 
-      {/* Table */}
       <div className="bg-card border border-border rounded-xl card-shadow overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
@@ -180,9 +181,15 @@ export default function EmployeesPage() {
             </tbody>
           </table>
         </div>
-        {filtered.length === 0 && (
+        {filtered.length === 0 && !loading && (
           <div className="py-12 text-center">
             <p className="text-sm text-muted-foreground">Nenhum funcionário encontrado</p>
+          </div>
+        )}
+        {loading && (
+          <div className="py-8 flex items-center justify-center gap-2 text-sm text-muted-foreground">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Carregando dados...
           </div>
         )}
       </div>

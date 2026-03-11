@@ -2,20 +2,18 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { MetricCard } from "@/components/metrics/MetricCard";
 import {
   Users, TrendingDown, Activity, AlertTriangle,
-  DollarSign, Target, ArrowUpRight
+  DollarSign, ArrowUpRight, Loader2
 } from "lucide-react";
 import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
 } from "recharts";
-import {
-  engagementTrend, turnoverTrend, departmentEngagement,
-  performanceDistribution, mockAlerts, mockTeams, mockEmployees
-} from "@/lib/mock-data";
 import { RiskBadge, PerformanceBadge, EngagementBar } from "@/components/metrics/StatusBadges";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useKipleData } from "@/hooks/useKipleData";
+import { KipleConnectionBanner } from "@/components/KipleConnectionBanner";
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
@@ -46,16 +44,35 @@ const alertText: Record<string, string> = {
 };
 
 export default function Dashboard() {
-  const atRiskEmployees = mockEmployees.filter(e => e.turnoverRisk === "high");
-  const totalTurnoverCost = mockEmployees.reduce((sum, e) => sum + e.turnoverCost, 0);
+  const {
+    employees, teams, engagementTrend, turnoverTrend,
+    departmentEngagement, performanceDistribution, alerts,
+    connectionStatus, loading
+  } = useKipleData();
+
+  const atRiskEmployees = employees.filter(e => e.turnoverRisk === "high");
+  const totalTurnoverCost = employees.reduce((sum, e) => sum + e.turnoverCost, 0);
+  const avgEngagement = employees.length
+    ? (employees.reduce((s, e) => s + e.engagementScore, 0) / employees.length).toFixed(1)
+    : "0";
+  const avgTurnoverRate = teams.length
+    ? (teams.reduce((s, t) => s + t.turnoverRate, 0) / teams.length).toFixed(1)
+    : "0";
 
   return (
     <DashboardLayout title="Dashboard" subtitle="Visão geral da sua força de trabalho">
+      <KipleConnectionBanner status={connectionStatus} />
+
       {/* Period selector */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-xl font-bold text-foreground">Visão Geral</h2>
-          <p className="text-sm text-muted-foreground mt-0.5">Janeiro 2024 • Atualizado há 2 horas</p>
+          <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
+            Visão Geral
+            {loading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
+          </h2>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            {employees.length} funcionários • {teams.length} equipes
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <Select defaultValue="30d">
@@ -80,7 +97,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
         <MetricCard
           title="Engajamento Geral"
-          value="84.6"
+          value={avgEngagement}
           unit="%"
           icon={<Activity className="h-4 w-4" />}
           color="primary"
@@ -89,7 +106,7 @@ export default function Dashboard() {
         />
         <MetricCard
           title="Taxa de Turnover"
-          value="12.8"
+          value={avgTurnoverRate}
           unit="%"
           icon={<TrendingDown className="h-4 w-4" />}
           color="warning"
@@ -122,10 +139,10 @@ export default function Dashboard() {
           <div className="bg-card border border-border rounded-xl p-4 card-shadow h-full">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-semibold text-foreground">Alertas Ativos</h3>
-              <span className="text-xs text-muted-foreground">4 alertas</span>
+              <span className="text-xs text-muted-foreground">{alerts.length} alertas</span>
             </div>
             <div className="space-y-2">
-              {mockAlerts.map((alert) => (
+              {alerts.map((alert) => (
                 <div key={alert.id} className={cn("border-l-2 rounded-r-lg p-3 text-xs", alertBg[alert.type])}>
                   <p className={cn("font-semibold mb-0.5", alertText[alert.type])}>{alert.title}</p>
                   <p className="text-muted-foreground leading-relaxed line-clamp-2">{alert.message}</p>
@@ -245,7 +262,7 @@ export default function Dashboard() {
               </tr>
             </thead>
             <tbody>
-              {mockTeams.slice(0, 6).map((team, i) => (
+              {teams.slice(0, 6).map((team, i) => (
                 <tr key={team.id} className={cn("border-b border-border hover:bg-muted/20 transition-colors cursor-pointer", i % 2 === 0 ? "" : "bg-muted/5")}>
                   <td className="px-4 py-3">
                     <div>
