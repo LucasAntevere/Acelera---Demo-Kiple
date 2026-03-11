@@ -27,9 +27,3 @@ dist-ssr
 .env
 .env.local
 .env.*.local
-
-# Build configuration duplicates
-vite.config.ts
-
-# Package locks
-package-lock.json
