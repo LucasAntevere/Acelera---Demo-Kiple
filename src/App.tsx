@@ -8,6 +8,7 @@ import TeamsPage from "./pages/Teams";
 import EmployeesPage from "./pages/Employees";
 import ReportsPage from "./pages/Reports";
 import SettingsPage from "./pages/Settings";
+import DatabaseSetupPage from "./pages/DatabaseSetup";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
