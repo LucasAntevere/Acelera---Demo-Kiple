@@ -75,6 +75,8 @@ export interface Desligamento {
   data_criacao: string;
   data_atualizacao: string;
   funcionario_nome?: string;
+  funcionario_cargo?: string | null;
+  funcionario_departamento_nome?: string | null;
   motivo_nome?: string;
 }
 

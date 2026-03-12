@@ -27,6 +27,8 @@ function mapDesligamento(row: any): Desligamento {
     data_criacao: row.data_criacao,
     data_atualizacao: row.data_atualizacao,
     funcionario_nome: row.funcionarios?.nome,
+    funcionario_cargo: row.funcionarios?.cargo ?? null,
+    funcionario_departamento_nome: row.funcionarios?.departamentos?.nome ?? null,
     motivo_nome: row.motivos_desligamento?.nome,
   };
 }
@@ -42,7 +44,7 @@ export function useDesligamentos() {
 
     const { data, error: dbError } = await kipledDb
       .from("desligamentos" as any)
-      .select("*, funcionarios(nome), motivos_desligamento(nome)")
+      .select("*, funcionarios(nome,cargo,departamentos(nome)), motivos_desligamento(nome)")
       .order("data_pedido", { ascending: false });
 
     if (dbError) {
@@ -62,7 +64,7 @@ export function useDesligamentos() {
   const listarPorFuncionario = async (funcionarioId: number) => {
     const { data } = await kipledDb
       .from("desligamentos" as any)
-      .select("*, funcionarios(nome), motivos_desligamento(nome)")
+      .select("*, funcionarios(nome,cargo,departamentos(nome)), motivos_desligamento(nome)")
       .eq("funcionario_id", funcionarioId)
       .order("data_pedido", { ascending: false });
 

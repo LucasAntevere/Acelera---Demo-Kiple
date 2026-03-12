@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__prodgy__get_project_context",
+      "mcp__prodgy__search_work_items",
+      "mcp__prodgy__get_work_item",
+      "Bash(npx tsc:*)",
+      "Bash(npm run:*)"
+    ]
+  }
+}
