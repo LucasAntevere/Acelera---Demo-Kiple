@@ -64,7 +64,23 @@ The app will be available at `http://localhost:9000`.
 
 ## Supabase Migration & Deploy
 
-> **Prerequisites:** `npx supabase` (Supabase CLI via npx) must be available. Set the access token before running any Supabase commands.
+> **Prerequisites:** `npx supabase` (Supabase CLI via npx) must be available. Set the access token and link the project before running any Supabase commands.
+
+### How migrations work
+
+**`scripts/migrate.ps1` is the standard way to deploy for any group.** It replaces `npx supabase db push` entirely. For each group deployment it:
+
+1. Reads `VITE_DB_SCHEMA` from `.env`
+2. Creates the PostgreSQL schema and grants the necessary permissions to Supabase roles
+3. Rewrites all `public.` references in the migration files to the target schema
+4. Executes each migration in chronological order via `supabase db query --linked`
+5. Runs the seed files in order: cleanup → reference data → bulk seed
+
+This means every group gets its own isolated schema within the same Supabase project. Set a unique `VITE_DB_SCHEMA` per group (e.g. `grupo1`, `grupo2`) in their `.env` file — the script handles the rest.
+
+> **Note:** After running the script for a new schema, go to **Supabase dashboard → Project Settings → API → Exposed Schemas** and add the schema name so the client can reach it.
+
+---
 
 ### Set the access token
 
@@ -78,18 +94,33 @@ $env:SUPABASE_ACCESS_TOKEN="<your-access-token>"
 npx supabase link --project-ref rnuguqmtdfhngvrwsbak
 ```
 
-### Push database migrations
+### Deploy migrations & seeds
 
-Applies all pending SQL migrations from `supabase/migrations/` to the linked project:
+Set the schema for the group in `.env` (see `.env.example`):
 
-```bash
-npx supabase db push
+```env
+VITE_DB_SCHEMA="grupo_a"   # unique per group, e.g. grupo_a, grupo_b, turma_1
+```
+
+Then run:
+
+```powershell
+# Preview substituted SQL without executing
+.\scripts\migrate.ps1 -DryRun
+
+# Apply migrations and seeds
+.\scripts\migrate.ps1
 ```
 
 Migrations (applied in order):
 1. `20260311193000_rh_operacional.sql` — Core RH operational schema
 2. `20260311221500_funcionario_data_nascimento_cargo.sql` — Employee birthdate and role fields
 3. `20260311233000_departamentos_funcionarios.sql` — Departments and employees relationship
+
+Seeds (applied in order):
+1. `cleanup_funcionarios_desligamentos.sql` — Removes existing employees and terminations
+2. `ref_data.sql` — Inserts required departments and termination reasons
+3. `seed_rh_massivo.sql` — Bulk employee and termination data
 
 ### Deploy Edge Functions
 
